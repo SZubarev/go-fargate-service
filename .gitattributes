@@ -1,0 +1,6 @@
+*.go linguist-detectable=true
+*.js linguist-detectable=false
+*.ts linguist-detectable=true
+Makefile linguist-detectable=false
+Dockerfile linguist-detectable=false
+
