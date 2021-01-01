@@ -7,8 +7,8 @@ GOPROXY = direct
 run:
 	go run cmd/main.go
 
-run_docker:
-	docker run -it -e PARAM1=test1 go-fargate
+run_docker: build_docker
+	docker run -it -e PARAM1=test1 -e AWS_PROFILE=${AWS_PROFILE} -v ${HOME}/.aws:/root/.aws go-fargate
 
 build:
 	GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -o bin/main ./cmd

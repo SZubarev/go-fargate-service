@@ -1,16 +1,11 @@
 import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
 import * as path from 'path';
-import * as ecr from '@aws-cdk/aws-ecr';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as ecs from '@aws-cdk/aws-ecs';
+import * as iam from '@aws-cdk/aws-iam'
 import { LogGroup } from '@aws-cdk/aws-logs'
-
-
 import { DockerImageAsset } from '@aws-cdk/aws-ecr-assets';
-import { Duration } from '@aws-cdk/core';
-import { memoryUsage } from 'process';
-import { Compatibility, ContainerImage, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
+import { ContainerImage, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
 
 
 export class FargateServiceStack extends cdk.Stack {
@@ -60,6 +55,12 @@ export class FargateServiceStack extends cdk.Stack {
       serviceName: "go-fargate-service",
       desiredCount: 1
     })
+
+    taskDef.addToTaskRolePolicy(new iam.PolicyStatement({
+      actions:["s3:ListAllMyBuckets"],
+      resources:["arn:aws:s3:::*"],
+      effect: iam.Effect.ALLOW
+    }))
 
   }
 }
