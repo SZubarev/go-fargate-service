@@ -18,7 +18,7 @@ RUN go test ./pkg/...
 RUN go build -tags lambda.norpc -ldflags="-s -w" main.go
 
 
-FROM alpine:3.12
+FROM alpine:latest
 
 WORKDIR /app
 
