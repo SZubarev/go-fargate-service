@@ -1,5 +1,5 @@
 # Golang AWS Fargate Service Boilerplate
-Boilerplate code of AWS Fargate service in Go deployed with AWS CDK.
+Boilerplate code of AWS Fargate service with Go deployed with AWS CDK.
 
 Batteries included:
 * Service logic stub in Go
