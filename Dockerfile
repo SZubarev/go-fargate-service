@@ -2,20 +2,17 @@ FROM golang:alpine AS build-image
 
 WORKDIR /app
 
-ENV GOPROXY direct
-ENV CGO_ENABLED=0
-
 RUN apk --no-cache add git
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN GOPROXY=direct go mod download
 
 COPY /cmd/*.go ./
 COPY /pkg ./pkg
 
-RUN go test ./pkg/...
+RUN CGO_ENABLED=0 go test ./pkg/...
 
-RUN go build -tags lambda.norpc -ldflags="-s -w" main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags lambda.norpc -ldflags="-s -w" main.go
 
 
 FROM alpine:latest
