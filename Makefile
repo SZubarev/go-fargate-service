@@ -5,7 +5,7 @@ AWS_PROFILE = default
 GOPROXY = direct
 
 run:
-	go run cmd/main.go
+	PARAM1=test go run cmd/main.go
 
 run_docker: build_docker
 	docker run -it -e PARAM1=test1 -e AWS_PROFILE=${AWS_PROFILE} -v ${HOME}/.aws:/root/.aws go-fargate

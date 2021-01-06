@@ -4,8 +4,8 @@ Boilerplate code of AWS Fargate service with Go deployed with AWS CDK.
 Batteries included:
 * Service logic stub in Go
 * Using Go modules
-* Using other AWS services in container (S3)
-* Grant permissions to Fargate Task to call AWS services
+* Using AWS services in container (S3)
+* Granting permissions to call AWS services
 * Multi-stage build
 * Testing in build container
 * Running locally as an app
