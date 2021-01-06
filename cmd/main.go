@@ -14,12 +14,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func main() {
-	ctx := context.TODO()
+var cfg aws.Config
+var ctx = context.TODO()
 
-	var cfg aws.Config
-	var err error
+func init() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	var err error
 
 	awsProfile := os.Getenv("AWS_PROFILE")
 	log.Printf("AWS_PROFILE: %s", awsProfile)
@@ -40,6 +41,9 @@ func main() {
 			log.Fatalf("Error loading profile %v", err)
 		}
 	}
+}
+
+func main() {
 
 	// Create S3 service client
 	s3Client := s3.NewFromConfig(cfg)
