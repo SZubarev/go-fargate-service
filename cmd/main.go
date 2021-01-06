@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -8,14 +9,16 @@ import (
 
 	"fargate-boilerplate/pkg/utils"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func main() {
-	var sess *session.Session
+	ctx := context.TODO()
 
+	var cfg aws.Config
+	var err error
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 
 	awsProfile := os.Getenv("AWS_PROFILE")
@@ -23,19 +26,25 @@ func main() {
 
 	if awsProfile != "" {
 		log.Println("Use AWS profile")
-		sess = session.Must(session.NewSessionWithOptions(session.Options{
-			SharedConfigState: session.SharedConfigEnable,
-			Profile:           awsProfile,
-		}))
+		cfg, err = config.LoadDefaultConfig(ctx,
+			config.WithSharedConfigProfile(awsProfile),
+		)
+		if err != nil {
+			log.Fatalf("Error loading profile %v", err)
+		}
+
 	} else {
 		log.Println("Use container role")
-		sess = session.Must(session.NewSession())
+		cfg, err = config.LoadDefaultConfig(ctx)
+		if err != nil {
+			log.Fatalf("Error loading profile %v", err)
+		}
 	}
 
 	// Create S3 service client
-	svc := s3.New(sess)
+	s3Client := s3.NewFromConfig(cfg)
 
-	result, err := svc.ListBuckets(nil)
+	result, err := s3Client.ListBuckets(ctx, nil)
 	if err != nil {
 		log.Fatalf("Unable to list buckets, %v", err)
 	}
@@ -43,8 +52,7 @@ func main() {
 	log.Println("Buckets:")
 
 	for _, b := range result.Buckets {
-		fmt.Printf("* %s created on %s\n",
-			aws.StringValue(b.Name), aws.TimeValue(b.CreationDate))
+		fmt.Printf("* %s\n", aws.ToString(b.Name))
 	}
 
 	param1 := os.Getenv("PARAM1")
