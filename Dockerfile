@@ -1,8 +1,6 @@
-FROM golang:1.15-alpine AS build-image
+FROM golang:1.15 AS build-image
 
 WORKDIR /app
-
-RUN apk --no-cache add git
 
 COPY go.mod go.sum ./
 RUN GOPROXY=direct go mod download
