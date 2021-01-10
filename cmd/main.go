@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"fargate-boilerplate/pkg/utils"
 
@@ -18,14 +19,15 @@ var cfg aws.Config
 var ctx = context.TODO()
 
 func init() {
-	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+
+	configLogrus()
 
 	var err error
 
-	awsProfile := os.Getenv("AWS_PROFILE")
+	awsProfile, ok := os.LookupEnv("AWS_PROFILE")
 	log.Printf("AWS_PROFILE: %s", awsProfile)
 
-	if awsProfile != "" {
+	if ok {
 		log.Println("Use AWS profile")
 		cfg, err = config.LoadDefaultConfig(ctx,
 			config.WithSharedConfigProfile(awsProfile),
@@ -41,6 +43,26 @@ func init() {
 			log.Fatalf("Error loading profile %v", err)
 		}
 	}
+}
+
+func configLogrus() {
+
+	customFormatter := new(log.TextFormatter)
+	customFormatter.TimestampFormat = "2006-01-02 15:04:05.000"
+	customFormatter.FullTimestamp = true
+	log.SetFormatter(customFormatter)
+
+	logLevelStr, ok := os.LookupEnv("LOG_LEVEL")
+	if !ok {
+		logLevelStr = "debug"
+	}
+
+	logLevel, err := log.ParseLevel(logLevelStr)
+	if err != nil {
+		logLevel = log.DebugLevel
+	}
+
+	log.SetLevel(logLevel)
 }
 
 func main() {
