@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
+
+	_ "fargate-boilerplate/pkg/log" // Configure logrus
 
 	log "github.com/sirupsen/logrus"
 
@@ -20,15 +21,13 @@ var ctx = context.TODO()
 
 func init() {
 
-	configLogrus()
-
 	var err error
 
 	awsProfile, ok := os.LookupEnv("AWS_PROFILE")
-	log.Printf("AWS_PROFILE: %s", awsProfile)
+	log.Infof("AWS_PROFILE: %s", awsProfile)
 
 	if ok {
-		log.Println("Use AWS profile")
+		log.Info("Use AWS profile")
 		cfg, err = config.LoadDefaultConfig(ctx,
 			config.WithSharedConfigProfile(awsProfile),
 		)
@@ -37,32 +36,12 @@ func init() {
 		}
 
 	} else {
-		log.Println("Use container role")
+		log.Info("Use container role")
 		cfg, err = config.LoadDefaultConfig(ctx)
 		if err != nil {
 			log.Fatalf("Error loading profile %v", err)
 		}
 	}
-}
-
-func configLogrus() {
-
-	customFormatter := new(log.TextFormatter)
-	customFormatter.TimestampFormat = "2006-01-02 15:04:05.000"
-	customFormatter.FullTimestamp = true
-	log.SetFormatter(customFormatter)
-
-	logLevelStr, ok := os.LookupEnv("LOG_LEVEL")
-	if !ok {
-		logLevelStr = "debug"
-	}
-
-	logLevel, err := log.ParseLevel(logLevelStr)
-	if err != nil {
-		logLevel = log.DebugLevel
-	}
-
-	log.SetLevel(logLevel)
 }
 
 func main() {
@@ -75,25 +54,27 @@ func main() {
 		log.Fatalf("Unable to list buckets, %v", err)
 	}
 
-	log.Println("Buckets:")
+	log.Debug("Buckets:")
 
 	for _, b := range result.Buckets {
-		fmt.Printf("* %s\n", aws.ToString(b.Name))
+		log.Debugf("* %s", aws.ToString(b.Name))
 	}
 
 	param1 := os.Getenv("PARAM1")
 
-	log.Println("Service started")
+	log.Info("Service started")
 
-	log.Printf("Param1: %s", param1)
+	log.Infof("Param1: %s", param1)
 
 	s := utils.GetHello()
 
-	log.Printf("Hello world %s", s)
+	log.Infof("Test from package: %s", s)
+
+	log.Error("Test error message")
 
 	for true {
 
-		log.Printf("Service is working")
+		log.Warnf("Service is working")
 		time.Sleep(5 * time.Second)
 
 	}
